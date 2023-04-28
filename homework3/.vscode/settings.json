@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.html.erb": "erb",
+        "select.h": "c",
+        "hiredis.h": "c",
+        "typeinfo": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}
