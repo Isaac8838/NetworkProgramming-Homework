@@ -2,10 +2,10 @@
 #include <func.h>
 #include <my_structure.h>
 
-void shell(char *buf, int sockfd) {
+void shell(char *buf, int sockfd, struct np *list) {
     int typeOfExec = 0;
     setenv("PATH", "bin:.:/bin", 1);
-    struct np *list = NULL;
+    // struct np *list = NULL;
     char ***cmd;
     cmd = (char ***)malloc(MAX_CMD * sizeof(char **));
     for (int i = 0; i < MAX_CMD; i++) {

@@ -29,32 +29,37 @@ int ownCmdHandler(char ****cmd, int sockfd) {
             return 1;
         case 3:
             if ((*cmd)[0][1] == NULL) {
-                perror("setenv needs a name!");
+                char msg[] = "setenv needs a name!";
+                write(sockfd, msg, strlen(msg));
                 return 1;
             }
             buf = getenv((*cmd)[0][1]);
             if (!buf) {
-                if (setenv((*cmd)[0][0], (*cmd)[0][1], 1) < 0) {
+                if (setenv((*cmd)[0][1], (*cmd)[0][2], 1) < 0) {
                     perror("setenv");
                 }
             }
             else {
                 strcat(buf, ":");
                 strcat(buf, (*cmd)[0][2]);
-                if (setenv((*cmd)[0][0], buf, 1) < 0) {
+                if (setenv((*cmd)[0][1], buf, 1) < 0) {
                     perror("setenv");
                 }
             }
             return 1;
         case 4:
             if ((*cmd)[0][1] == NULL) {
-                perror("getenv needs a name!");
+                char msg[] = "getenv needs a name!";
+                write(sockfd, msg, strlen(msg));
                 return 1;
             }
             buf = getenv((*cmd)[0][1]);
-            if (buf)
-                printf("\t%s\n", buf);
-            else printf("\n");
+            if (buf) {
+                char msg[1024] = {};
+                sprintf(msg, "\t%s\n", buf);
+                write(sockfd, msg, strlen(msg));
+            }
+            else write(sockfd, "\n", strlen("\n"));
             return 1;
         default:
             break;

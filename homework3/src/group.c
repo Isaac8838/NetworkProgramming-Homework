@@ -108,6 +108,8 @@ void CreateGroup(int sockfd, char *name, char *cmd) {
     reply = redisCommand(rc, "ZADD groupList %d %s", gid + 1, groupName);
 
     if (reply->integer) {
+        redisReply *tr = redisCommand(rc, "ZADD %s 1 %s", groupName, name);
+        freeReplyObject(tr);
         char msg[] = "Create success !\n";
         write(sockfd, msg, strlen(msg));
     }
@@ -115,9 +117,6 @@ void CreateGroup(int sockfd, char *name, char *cmd) {
         char msg[] = "Group already exist !\n";
         write(sockfd, msg, strlen(msg));
     }
-    freeReplyObject(reply);
-
-    reply = redisCommand(rc, "ZADD %s 1 %s", groupName, name);
     freeReplyObject(reply);
 }
 
@@ -139,6 +138,10 @@ void DelGroup(int sockfd, char *name, char *cmd) {
             redisReply *tr = redisCommand(rc, "DEL %s", delGroup);
             char msg[] = "Group delete success !\n";
             write(sockfd, msg, strlen(msg));
+            freeReplyObject(tr);
+            
+            tr = redisCommand(rc, "ZREM groupList %s", delGroup);
+            freeReplyObject(tr);
         }
         else {
             char msg[] = "You don't have permissions !\n";
@@ -264,7 +267,9 @@ void LeaveGroup(int sockfd, char *name, char *cmd) {
     }
 
     freeReplyObject(reply);
-
+    redisReply *tr = redisCommand(rc, "ZRANGE %s 0 -1", groupName);
+    size_t numberOfpeople = tr->elements;
+    freeReplyObject(tr);
     reply = redisCommand(rc, "ZREM %s %s", groupName, name);
 
     if (reply && reply->integer == 0) {
@@ -273,6 +278,13 @@ void LeaveGroup(int sockfd, char *name, char *cmd) {
         freeReplyObject(reply);
         return;
     }
+
+    
+    if (numberOfpeople == 1) {
+        tr = redisCommand(rc, "ZREM groupList %s", groupName);
+        freeReplyObject(tr);
+    }
+
     char msg[] = "Leave accept !\n";
     write(sockfd, msg, strlen(msg));
     freeReplyObject(reply);

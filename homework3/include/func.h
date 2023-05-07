@@ -49,7 +49,7 @@ void addNum(struct np **list);
 // -----------------
 
 // ----shell----
-void shell(char *buf, int sockfd);
+void shell(char *buf, int sockfd, struct np *list);
 // -------------
 
 // ----redis----
@@ -63,9 +63,9 @@ char *login(int sockfd);
 // -------------
 
 // ----mailBox----
-int isMailBox(int sockfd, char *buf, char *name);
+int isMailBox(int sockfd, char *buf, char *name, struct np *list);
 void ListMail(int sockfd, char *name);
-void Mailto(int sockfd, char *name, char *cmd);
+void Mailto(int sockfd, char *name, char *cmd, struct np *list);
 void DelMail(int sockfd, char *name, char *cmd);
 // ---------------
 

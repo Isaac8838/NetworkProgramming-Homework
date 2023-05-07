@@ -3,7 +3,7 @@
 #include <my_structure.h>
 #include <my_redis.h>
 
-int isMailBox(int sockfd, char *buf, char *name) {
+int isMailBox(int sockfd, char *buf, char *name, struct np *list) {
     char mailCMD[3][11] = {"listMail", "mailto", "delMail"};
     char cmd[64] = {};
     sscanf(buf, "%s", cmd);
@@ -15,7 +15,7 @@ int isMailBox(int sockfd, char *buf, char *name) {
                 return 1;
             }
             else if (i == 1) {
-                Mailto(sockfd, name, buf);
+                Mailto(sockfd, name, buf, list);
                 return 1;
             }
             else if (i == 2) {
@@ -47,8 +47,9 @@ void ListMail(int sockfd, char *name) {
     freeReplyObject(reply);
 }
 
-void Mailto(int sockfd, char *name, char *cmd) {
+void Mailto(int sockfd, char *name, char *cmd, struct np *list) {
     char buf[4096] = {};
+    t = time(NULL);
     struct tm *tm = localtime(&t);
     char current_time[256] = {};
     char message[3072] = {};
@@ -76,7 +77,7 @@ void Mailto(int sockfd, char *name, char *cmd) {
         if (pipe(fd) == -1)
             perror("pipe");
 
-        shell(message, fd[1]);
+        shell(message, fd[1], list);
         close(fd[1]);
         read(fd[0], message, sizeof(message));
         close(fd[0]);

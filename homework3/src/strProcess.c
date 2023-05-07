@@ -8,6 +8,7 @@ void subServer(int sockfd, int c_fifofd, int s_fifofd, int id, char *cname) {
     char *prompt = malloc(sizeof(char) * 1024);
     fd_set all_fds;
     int max_fd, num_byte;
+    struct np *list = NULL;
     
     // Change 3 最重要的部分 （主要的BUG
     // 每次都必須把fd_set 歸零
@@ -113,9 +114,9 @@ void subServer(int sockfd, int c_fifofd, int s_fifofd, int id, char *cname) {
                 for (int i = 0; i < strlen(buf); i++) {
                     if (buf[i] == '\r') {buf[i] = '\0'; break;}
                 }
-                if (isMailBox(sockfd, buf, cname)) {} 
+                if (isMailBox(sockfd, buf, cname, list)) {} 
                 else if (isGroup(sockfd, s_fifofd, c_fifofd, buf, cname)) {}
-                else shell(buf, sockfd); 
+                else shell(buf, sockfd, list); 
             }
         }
         if (FD_ISSET(s_fifofd, &all_fds)) {
